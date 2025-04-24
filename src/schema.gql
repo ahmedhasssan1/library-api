@@ -1,0 +1,40 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type authors {
+  id: Int!
+  name: String!
+  info: String!
+  age: Float
+  books: [Books!]
+}
+
+type Books {
+  id: Int!
+  name: String!
+  author: authors
+}
+
+type Query {
+  getAllBooks: [Books!]!
+  getbookAuthor(bookId: Float!): authors!
+  findOneAuthor(id: Int!): authors!
+  authors: [authors!]!
+}
+
+type Mutation {
+  createBook(CreateBookWithAutor: createBookdto!): Books!
+  CreateAuthor(CreateAuthor: CreateAuthorDto!): authors!
+}
+
+input createBookdto {
+  name: String!
+  author: Int
+}
+
+input CreateAuthorDto {
+  name: String!
+  info: String!
+  age: Float
+}
