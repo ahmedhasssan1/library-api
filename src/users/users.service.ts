@@ -1,0 +1,55 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Users } from './entity/user.entity';
+import { Repository } from 'typeorm';
+import { createUserDto } from './dto/create.input';
+import { BookToUserDto } from './dto/bookToUser.input';
+import { BooksService } from 'src/books/books.service';
+
+@Injectable()
+export class UsersService {
+    constructor(@InjectRepository(Users) private userRepo:Repository<Users>,
+    private BookService:BooksService
+){}
+
+    async createUser(createUserDto:createUserDto):Promise<Users>{
+        const user=this.userRepo.create(createUserDto)
+        const savedUser=await this.userRepo.save(user);
+        return savedUser;
+    }
+    
+    async   getUser(id:number):Promise<Users>{
+        const user=await this.userRepo.findOne({where:{id},relations:['book']});
+
+        if(!user){
+            throw new NotFoundException('this user not exist');
+        }
+        return user;
+
+    }
+    
+    async addBookToUser(bookToUser:BookToUserDto):Promise<Users>{
+        const user=await this.getUser(bookToUser.userId)
+        const book = await this.BookService.findOneBook(bookToUser.BookId);
+        if (!book) {
+            throw new NotFoundException('this book does not exist');
+        }
+        user.book.push(book);
+        return  await this.userRepo.save(user);
+
+
+        
+    }
+    async getAllUsers():Promise<Users[]>{
+        const users=await this.userRepo.find({relations:['book']});
+        if(!users ||users.length===0){
+            throw new NotFoundException('no users exist')
+        }        
+        return users
+    }
+
+
+
+
+
+}

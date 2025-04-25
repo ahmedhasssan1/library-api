@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { createBookdto } from './dto/createBook.input';
 import { AuthorsService } from 'src/authors/authors.service';
 import { authors } from 'src/authors/entity/author.entity';
+import { updateDto } from './dto/update.input';
 
 @Injectable()
 export class BooksService {
@@ -12,6 +13,14 @@ export class BooksService {
     private authorService:AuthorsService
 
 ){}
+
+    async findOneBook(id:number):Promise<Books>{
+        const book=await this.BookRepo.findOne({where:{id}})
+        if(!book){
+            throw new NotFoundException('this book not exist')
+        }
+        return book;
+    }
 
     async CreateBook( createbook:createBookdto):Promise<Books>{
         
@@ -42,9 +51,32 @@ export class BooksService {
         if(!Book){
             throw new NotFoundException('this book not existing');
         
-        }
+        } 
         return Book.author;
 
+    }
+
+    async updateBook(updateBook:updateDto):Promise<Books>{
+       const  book=await this.BookRepo.update(updateBook.id,{...updateBook})
+        const findbookIpdated=await this.BookRepo.findOneOrFail({where:{id:updateBook.id}});
+        if(!findbookIpdated){
+            throw new NotFoundException('this book not existing any more')
+        }
+        return findbookIpdated;
+    }
+
+    async getAuthor(id:number):Promise<authors>{
+        const author=await this.authorService.findOne(id);
+        return author;
+    }
+
+    async findAuthorBooks(authorId:number){
+        const author=await this.authorService.findOne(authorId);
+        if(!author){
+            throw new NotFoundException('this uathor not exist')
+        }
+        const authorBooks=await this.BookRepo.find({where:{author:{id:authorId}}});
+        return authorBooks;
     }
 
     

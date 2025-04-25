@@ -10,22 +10,40 @@ type authors {
   books: [Books!]
 }
 
+type Users {
+  id: Int!
+  name: String!
+  contact_info: String!
+  email: String!
+  book: [Books!]
+}
+
 type Books {
   id: Int!
   name: String!
   author: authors
+  user: Users!
+  getAuthor: authors!
 }
 
 type Query {
   getAllBooks: [Books!]!
   getbookAuthor(bookId: Float!): authors!
+  getAuthorBooks(auhtorID: Int!): [Books!]!
+  getOneBook(findBook: Int!): Books!
   findOneAuthor(id: Int!): authors!
   authors: [authors!]!
+  getUser(getuserById: Int!): Users!
+  getAllUsers: [Users!]!
 }
 
 type Mutation {
   createBook(CreateBookWithAutor: createBookdto!): Books!
+  updateBook(updateBook: updateDto!): Books!
   CreateAuthor(CreateAuthor: CreateAuthorDto!): authors!
+  updateAuthor(updateAuthor: updateAuthorDto!): authors!
+  createUser(createUser: createUserDto!): Users!
+  addBookToUser(bookToUser: BookToUserDto!): Users!
 }
 
 input createBookdto {
@@ -33,8 +51,30 @@ input createBookdto {
   author: Int
 }
 
+input updateDto {
+  id: Float!
+  name: String!
+}
+
 input CreateAuthorDto {
   name: String!
   info: String!
   age: Float
+}
+
+input updateAuthorDto {
+  id: Float!
+  name: String!
+  info: String!
+}
+
+input createUserDto {
+  name: String!
+  contact_info: String!
+  email: String!
+}
+
+input BookToUserDto {
+  userId: Int!
+  BookId: Int!
 }

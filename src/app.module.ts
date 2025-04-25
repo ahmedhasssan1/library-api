@@ -6,6 +6,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { BooksModule } from './books/books.module';
 import { AuthorsModule } from './authors/authors.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities:true
     }),
     BooksModule,
-    AuthorsModule
+    AuthorsModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService],
