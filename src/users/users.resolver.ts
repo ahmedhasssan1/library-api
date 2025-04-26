@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { createUserDto } from './dto/create.input';
 import { Users } from './entity/user.entity';
@@ -26,4 +26,12 @@ export class UsersResolver {
   getAllUsers():Promise<Users[]>{
     return this.usersService.getAllUsers();
   }
+  @Mutation(()=>Boolean)
+  deleteUser(@Args('userId',{type:()=>Int})Id:number){
+    return this.usersService.deleteUSer(Id)
+
+  }
+  
+
+  
 }

@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { createUserDto } from './dto/create.input';
 import { BookToUserDto } from './dto/bookToUser.input';
 import { BooksService } from 'src/books/books.service';
+import   * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,8 @@ export class UsersService {
 
     async createUser(createUserDto:createUserDto):Promise<Users>{
         const user=this.userRepo.create(createUserDto)
+         user.password=await bcrypt.hash(user.password,10);
+         console.log('debugging ',user.password);
         const savedUser=await this.userRepo.save(user);
         return savedUser;
     }
@@ -46,6 +49,22 @@ export class UsersService {
             throw new NotFoundException('no users exist')
         }        
         return users
+    }
+    async deleteUSer(userId:number){
+        const user=await this.userRepo.findOne({where:{id:userId}});
+        if(!user){
+            throw new NotFoundException('this user not exist');
+
+        }
+        await this.userRepo.delete(userId);
+        return true;
+    }
+    async findUserByEmail(email:string){
+        const user=await this.userRepo.findOne({where:{email}});
+        if(!user){
+            throw new NotFoundException('this user not exist');
+        }
+        return user
     }
 
 

@@ -11,7 +11,7 @@ export class BooksResolver {
 
   ) {}
 
-  @Mutation((of)=>Books)
+  @Mutation(()=>Books)
   createBook(@Args('CreateBookWithAutor')createBook:createBookdto):Promise<Books>{
     return this.booksService.CreateBook(createBook)
   }

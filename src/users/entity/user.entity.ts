@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { Books } from "src/books/entity/books.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 @ObjectType()
@@ -22,7 +22,12 @@ export class Users{
     @Field()
     email:string
 
+    @Column()
+    @Field()
+    password:string
+
     @OneToMany(()=>Books,(book)=>book.user,{onDelete:'SET NULL'})
+    // @JoinColumn()
     @Field(()=>[Books],{nullable:true})
     book:Books[]
 

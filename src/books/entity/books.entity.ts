@@ -16,12 +16,13 @@ export class Books{
     name:string
 
     @ManyToOne(()=>authors,author=>author.books,{onDelete:'CASCADE'})
-    @JoinColumn()
     @Field(()=>authors,{nullable:true})
     author:authors
 
 
-    @ManyToOne(()=>Users,(user)=>user.book)
-    @Field(()=>Users)
+    
+    @ManyToOne(()=>Users,(user)=>user.book,{onDelete:'SET NULL',nullable:true},)
+    @JoinColumn()
+    @Field(()=>Users,{nullable:true})
     user:Users
 }

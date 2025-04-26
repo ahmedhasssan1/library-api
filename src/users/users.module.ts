@@ -8,5 +8,6 @@ import { BooksModule } from 'src/books/books.module';
 @Module({
   imports:[TypeOrmModule.forFeature([Users]),BooksModule],
   providers: [UsersResolver, UsersService],
+  exports:[UsersService]
 })
 export class UsersModule {}

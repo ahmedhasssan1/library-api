@@ -15,6 +15,7 @@ type Users {
   name: String!
   contact_info: String!
   email: String!
+  password: String!
   book: [Books!]
 }
 
@@ -22,8 +23,12 @@ type Books {
   id: Int!
   name: String!
   author: authors
-  user: Users!
+  user: Users
   getAuthor: authors!
+}
+
+type tokenDto {
+  access_token: String!
 }
 
 type Query {
@@ -44,6 +49,8 @@ type Mutation {
   updateAuthor(updateAuthor: updateAuthorDto!): authors!
   createUser(createUser: createUserDto!): Users!
   addBookToUser(bookToUser: BookToUserDto!): Users!
+  deleteUser(userId: Int!): Boolean!
+  signIn(login: securityDto!): tokenDto!
 }
 
 input createBookdto {
@@ -72,9 +79,15 @@ input createUserDto {
   name: String!
   contact_info: String!
   email: String!
+  password: String!
 }
 
 input BookToUserDto {
   userId: Int!
   BookId: Int!
+}
+
+input securityDto {
+  email: String!
+  password: String!
 }

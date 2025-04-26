@@ -4,7 +4,6 @@ import { authors } from './entity/author.entity';
 import { Repository } from 'typeorm';
 import { CreateAuthorDto } from './dto/createAuthor.input';
 import { updateAuthorDto } from './dto/updateAuthor.input';
-import { BooksService } from 'src/books/books.service';
 import { Books } from 'src/books/entity/books.entity';
 
 @Injectable()
