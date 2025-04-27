@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -17,13 +18,16 @@ import { CartModule } from './cart/cart.module';
       autoSchemaFile:'src/schema.gql',
 
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 4000, 
       username: 'postgres',
-      password: '123456',
-      database: 'library',
+      password: process.env.databasePassword,
+      database: process.env.database,
       // entities: [__dirname + '/../**/*.entity{.ts,.js}'], 
       synchronize: true, 
       autoLoadEntities:true

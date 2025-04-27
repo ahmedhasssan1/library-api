@@ -47,7 +47,6 @@ async addBookToUserCart(booktoCart:bookToCartItemDto):Promise<CartItem>{
     if(!findCart){
         findCart=await this.createCart(booktoCart.userId);
     }
-    findCart.totalPrice=0;
     const UsercartItem=await this.CartItemRepo.findOne({where:
         {
             cart:{id:findCart.id},
@@ -115,7 +114,7 @@ async deleteBook(bookIDAndUserID:bookToCartItemDto){
     findCart.totalPrice-=cartitem.book.price;
     await this.CartRepo.save(findCart);
     cartitem.quantit--;
-    if(cartitem.quantit<0){
+    if(cartitem.quantit<=0){
         await this.CartItemRepo.remove(cartitem);
     }else{
          await this.CartItemRepo.save(cartitem);
@@ -125,15 +124,6 @@ async deleteBook(bookIDAndUserID:bookToCartItemDto){
     
 
 }
-
-
-
-
-
-
-
-
-
 
 
 
