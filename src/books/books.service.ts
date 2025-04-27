@@ -8,7 +8,7 @@ import { authors } from 'src/authors/entity/author.entity';
 import { updateDto } from './dto/update.input';
 
 @Injectable()
-export class BooksService {
+export class    BooksService {
     constructor(@InjectRepository(Books) private BookRepo:Repository<Books>,
     private authorService:AuthorsService
 
@@ -24,16 +24,17 @@ export class BooksService {
 
     async CreateBook( createbook:createBookdto):Promise<Books>{
         
-        const findAuthor=await this.authorService.findOne(createbook.author);
+        const findAuthor=await this.authorService.findOne(createbook.authorID);
         if(!findAuthor){
             throw new NotFoundException('this author not exist');
         }
         const createBook=this.BookRepo.create({
             name:createbook.name,
-            author:findAuthor
+            author:findAuthor,
+            price:createbook.price
         }
         )
-        console.log('debugging ',createBook);
+        // console.log('debugging ',createBook);
         
 
         return  await this.BookRepo.save(createBook)

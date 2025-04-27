@@ -10,5 +10,8 @@ export class createBookdto{
 
     @Field(()=>Int,{nullable:true})
     @IsOptional()
-    author:number
+    authorID:number
+    
+    @Field()
+    price:number
 }

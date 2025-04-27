@@ -23,12 +23,34 @@ type Books {
   id: Int!
   name: String!
   author: authors
+  price: Int!
   user: Users
   getAuthor: authors!
 }
 
 type tokenDto {
   access_token: String!
+}
+
+type Cart {
+  id: Float!
+  user: Users!
+  totalPrice: Float!
+  discount: Float!
+}
+
+type CartItem {
+  id: Int!
+  cart: Cart!
+  book: Books!
+  bookPrice: Float!
+  bookName: String!
+  quantit: Int!
+}
+
+type UserCart {
+  cartitems: [CartItem!]!
+  cart: Cart!
 }
 
 type Query {
@@ -40,6 +62,8 @@ type Query {
   authors: [authors!]!
   getUser(getuserById: Int!): Users!
   getAllUsers: [Users!]!
+  getallCarts: [Cart!]!
+  getUserCart(userId: Int!): UserCart!
 }
 
 type Mutation {
@@ -51,11 +75,15 @@ type Mutation {
   addBookToUser(bookToUser: BookToUserDto!): Users!
   deleteUser(userId: Int!): Boolean!
   signIn(login: securityDto!): tokenDto!
+  createcart(userId: Int!): Cart!
+  addCartItem(addBookIDAndUserId: bookToCartItemDto!): CartItem!
+  deleteBook(bookIDAndUSerId: bookToCartItemDto!): Boolean!
 }
 
 input createBookdto {
   name: String!
-  author: Int
+  authorID: Int
+  price: Float!
 }
 
 input updateDto {
@@ -90,4 +118,9 @@ input BookToUserDto {
 input securityDto {
   email: String!
   password: String!
+}
+
+input bookToCartItemDto {
+  userId: Int!
+  bookId: Int!
 }

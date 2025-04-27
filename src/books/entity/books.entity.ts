@@ -19,10 +19,15 @@ export class Books{
     @Field(()=>authors,{nullable:true})
     author:authors
 
+    @Column()
+    @Field(()=>Int)
+    price:number
+
 
     
     @ManyToOne(()=>Users,(user)=>user.book,{onDelete:'SET NULL',nullable:true},)
     @JoinColumn()
     @Field(()=>Users,{nullable:true})
     user:Users
+
 }
