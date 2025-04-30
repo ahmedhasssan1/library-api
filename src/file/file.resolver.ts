@@ -10,6 +10,6 @@ export class FilResolver {
   async uploadPhoto(
     @Args('createImageInput') createImageInput: uploadPhotoDto,
   ): Promise<string> {
-    return this.filService.uploadImage(createImageInput);
+    return this.filService.uploadImage(createImageInput.file);
   }
 }

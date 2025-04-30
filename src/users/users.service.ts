@@ -7,21 +7,39 @@ import { BookToUserDto } from './dto/bookToUser.input';
 import { BooksService } from 'src/books/books.service';
 import   * as bcrypt from 'bcrypt'
 import { uploadPhotoDto } from '../file/dto/uploadPhoto.input';
+import { emitWarning } from 'process';
+import { FilService } from 'src/file/file.service';
 
 @Injectable()
 export class UsersService {
     constructor(@InjectRepository(Users) private userRepo:Repository<Users>,
-    private BookService:BooksService
+    private BookService:BooksService,
+    private photoUpload:FilService
 ){}
 
     async createUser(createUserDto:createUserDto):Promise<Users>{
-        const user=this.userRepo.create(createUserDto)
+        const file=createUserDto.file;
+        const photoUploaded=await this.photoUpload.uploadImage(file)
+        console.log('file',photoUploaded)
+        const user=this.userRepo.create({
+            name:createUserDto.name,
+            email:createUserDto.email,
+            contact_info:createUserDto.contact_info,
+            password:createUserDto.password,
+            photo:photoUploaded
+                        
+        }        
+        )
+        console.log('debugging ',user);
+        
          user.password=await bcrypt.hash(user.password,10);
          console.log('debugging ',user.password);
+         console.log('debugging ',user);
+
         const savedUser=await this.userRepo.save(user);
         return savedUser;
     }
-    
+
     async   getUser(id:number):Promise<Users>{
         const user=await this.userRepo.findOne({where:{id},relations:['book']});
 

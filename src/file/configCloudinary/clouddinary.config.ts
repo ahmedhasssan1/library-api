@@ -5,9 +5,9 @@ export const cloudinaryConfig=(configService:ConfigService)=>{
 
 
     cloudinary.config({
-        cloud_name:'duj5aatpw',
-        api_key:'674196652231976',
-        api_secret:'XgNYLL2YWD1ALUqjXHs6_WQaWW8'
+        cloud_name:configService.get<string>('cloud_name'),
+        api_key:configService.get<string>('cloudinary_api_key'),
+        api_secret:configService.get<string>('cloudinary_api_secret')
     })
 
 

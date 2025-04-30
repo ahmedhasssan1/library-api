@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config'
 import { v2 as cloudinary } from 'cloudinary'
 import { uploadPhotoDto } from './dto/uploadPhoto.input'
 import { cloudinaryConfig } from './configCloudinary/clouddinary.config'
+import { Repository } from 'typeorm'
+import { Users } from 'src/users/entity/user.entity'
+import { FileUpload } from 'src/common/interfaces/file-upload.interface'
 
 @Injectable()
 export class FilService {
@@ -12,11 +15,11 @@ export class FilService {
   }
 
   async uploadImage (
-    createImageInput: uploadPhotoDto,
+    createImageInput: Promise<FileUpload>,
     dirUpload: string = 'avatars',
   ): Promise<string> {
     try {
-      const { createReadStream, filename } = await createImageInput.file
+      const { createReadStream, filename } = await createImageInput
 
       if (!createReadStream || typeof createReadStream !== 'function') {
         throw new HttpException('Invalid file input', HttpStatus.BAD_REQUEST)
@@ -57,7 +60,7 @@ export class FilService {
           HttpStatus.BAD_REQUEST,
         )
       }
-
+      
       console.log('Upload successful:', result.secure_url)
       return result.secure_url
     } catch (error) {

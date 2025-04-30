@@ -12,6 +12,7 @@ import { CartModule } from './cart/cart.module';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { FileModule } from './file/file.module';
+import { GraphQLUpload } from 'graphql-upload-ts';
 
 @Module({
   imports: [
