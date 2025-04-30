@@ -15,7 +15,7 @@ export class Cart {
   @Field()
   user:Users
 
-  @Column({default:0})
+  @Column({default:0,type:'float'})
   @Field()
   totalPrice: number;
 

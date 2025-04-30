@@ -3,6 +3,9 @@ import { UsersService } from './users.service';
 import { createUserDto } from './dto/create.input';
 import { Users } from './entity/user.entity';
 import { BookToUserDto } from './dto/bookToUser.input';
+import { NotFoundException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 @Resolver(()=>Users)
 export class UsersResolver {
@@ -31,7 +34,18 @@ export class UsersResolver {
     return this.usersService.deleteUSer(Id)
 
   }
+  // @Mutation(() => String)
+  // async uploadPhotowithUSer(
+  //   @Args('file', { type: () => GraphQLUpload }) file: Promise<FileUpload>
+  // ) {
+  //   const { filename, createReadStream,mimetype,encoding } = await file;
+  //   console.log(file)
+  //   if (!filename) {
+  //     throw new NotFoundException('No photo uploaded');
+  //   }
   
-
-  
+  //   // save the file...
+  //   return `Photo uploaded successfully`;
+  // }
+    
 }

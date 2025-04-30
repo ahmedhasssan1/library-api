@@ -6,6 +6,7 @@ import { createUserDto } from './dto/create.input';
 import { BookToUserDto } from './dto/bookToUser.input';
 import { BooksService } from 'src/books/books.service';
 import   * as bcrypt from 'bcrypt'
+import { uploadPhotoDto } from '../file/dto/uploadPhoto.input';
 
 @Injectable()
 export class UsersService {
@@ -66,6 +67,17 @@ export class UsersService {
         }
         return user
     }
+    // async uploadPhoto(uploadPhoto:uploadPhotoDto){
+
+    //     const user= await this.getUser(uploadPhoto.userId);
+    //     if(!user){
+    //         throw new NotFoundException('this user not exist')
+    //     } 
+    //     user.photo=uploadPhoto.photo;
+    //     await this.userRepo.save(user);
+    //     return user
+
+    // }
 
 
 

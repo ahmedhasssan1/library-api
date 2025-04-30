@@ -31,6 +31,10 @@ export class Users{
     @Field(()=>[Books],{nullable:true})
     book:Books[]
 
+    @Column()
+    @Field({nullable:true})
+    photo:string
+
     // @OneToOne(() => Cart, (cart) => cart.user)
     // @Field(() => Cart, { nullable: true })
     // cart?: Cart;

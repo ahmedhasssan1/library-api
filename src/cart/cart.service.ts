@@ -7,6 +7,8 @@ import { UsersService } from 'src/users/users.service';
 import { BooksService } from 'src/books/books.service';
 import { CartItem } from './entity/cartItem.entity';
 import { UserCart } from './dto/UserCart.input';
+import { DiscountDto } from './dto/discountDto.input';
+import { find } from 'rxjs';
 
 @Injectable()
 export class CartService {
@@ -16,12 +18,12 @@ constructor(@InjectRepository(Cart) private CartRepo:Repository<Cart>,
     private  bookService:BooksService
 ){}
 
-async createCart(userId:number):Promise<Cart>{
+async createCart(userId:number,discount:number):Promise<Cart>{
     const  findUserCart=await this.CartRepo.findOne({where:{user:{id:userId}},relations:['user']})
     if(findUserCart){
         return findUserCart;
     }
-    const createCart=this.CartRepo.create({user:{id:userId}})
+    const createCart=this.CartRepo.create({user:{id:userId},discount})
     return await this.CartRepo.save(createCart);
     
 }
@@ -45,7 +47,7 @@ async addBookToUserCart(booktoCart:bookToCartItemDto):Promise<CartItem>{
         relations:['user']
     })
     if(!findCart){
-        findCart=await this.createCart(booktoCart.userId);
+        findCart=await this.createCart(booktoCart.userId,0);
     }
     const UsercartItem=await this.CartItemRepo.findOne({where:
         {
@@ -56,9 +58,7 @@ async addBookToUserCart(booktoCart:bookToCartItemDto):Promise<CartItem>{
 
    
     findCart.totalPrice+=findBook.price;
-    if(findCart.discount>0){
-        findCart.totalPrice=findCart.totalPrice*(findCart.discount%100)
-    }
+  
     await this.CartRepo.save(findCart);
 
     if(UsercartItem?.book.id===booktoCart.bookId){
@@ -84,12 +84,17 @@ async getUserCart(userId:number):Promise<UserCart>{
     if(!findCart){
         throw new NotFoundException("this user do not have cart")
     }
+    if(findCart.discount>0){
+
+        findCart.totalPrice-=(findCart.totalPrice*(findCart.discount/100))
+
+    }
     return {
         cart:findCart,
         cartitems:findCartItem
     };
 }
-async deleteBook(bookIDAndUserID:bookToCartItemDto){
+async decreaseQuantityofBook(bookIDAndUserID:bookToCartItemDto){
     const user=await this.userService.getUser(bookIDAndUserID.userId);
     if(!user){
         throw new NotFoundException('this user not exist')
@@ -112,6 +117,9 @@ async deleteBook(bookIDAndUserID:bookToCartItemDto){
     }
 
     findCart.totalPrice-=cartitem.book.price;
+    if (findCart.totalPrice<0){
+        findCart.totalPrice=0;
+    }
     await this.CartRepo.save(findCart);
     cartitem.quantit--;
     if(cartitem.quantit<=0){
@@ -121,8 +129,49 @@ async deleteBook(bookIDAndUserID:bookToCartItemDto){
     }
     return true;
 
-    
+}
+async deleteBook(bookIDAndUser:bookToCartItemDto){
+    const user= await this.userService.getUser(bookIDAndUser.userId);
+    if(!user){
+        throw new NotFoundException('this user not exist')
+    }
+    const cart=await this.CartRepo.findOne({where:{user:{id:bookIDAndUser.userId}}});
+    if(!cart){
+        throw new NotFoundException("this cart not exist")
+    }
+    const cartitem=await this.CartItemRepo.findOne({where:{book:{id:bookIDAndUser.bookId}}});
+    if(!cartitem){
+        throw new NotFoundException('this cartitem not exist');
+    }
+    if(cart.discount>0){
 
+        cart.totalPrice-=(cartitem.bookPrice*cartitem.quantit)/(cart.discount*100);
+    }
+    if(cart.totalPrice<0){
+        cart.totalPrice=0;
+    }
+    await this.CartItemRepo.remove(cartitem)
+    const deletedItem= await this.CartRepo.save(cart);
+    if(deletedItem){
+        return true
+    }
+    return false;
+}
+async updateDiscount(updateDicount:DiscountDto):Promise<string>{
+    const user=await this.userService.getUser(updateDicount.userId);
+    if(!user){
+        throw new NotFoundException("this user not exist")
+    }
+    const userCart=await this.CartRepo.findOne({where:{user:{id:updateDicount.userId}}})
+    if(!userCart){
+        await this.createCart(updateDicount.userId,updateDicount.discount);
+        
+    }
+    userCart!.discount=updateDicount.discount;
+    await this.CartRepo.save(userCart!)
+    return `discount fir user id ${user.id} has been updated to ${updateDicount.discount}`;
+
+    
 }
 
 

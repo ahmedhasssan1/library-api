@@ -16,7 +16,7 @@ export class CartItem{
     @Field(()=>Cart)
     cart:Cart
 
-    @ManyToOne(()=>Books,(book)=>book.id,{onDelete:'SET NULL'})
+    @ManyToOne(()=>Books,(book)=>book.id,{onDelete:'CASCADE'})
     @JoinColumn()
     @Field(()=>Books)
     book:Books

@@ -4,14 +4,15 @@ import { Cart } from './entity/cart.entity';
 import { CartItem } from './entity/cartItem.entity';
 import { bookToCartItemDto } from './dto/addbookToUserCart.input';
 import { UserCart } from './dto/UserCart.input';
+import { DiscountDto } from './dto/discountDto.input';
 
 @Resolver()
 export class CartResolver {
   constructor(private readonly cartService: CartService) {}
 
   @Mutation(()=>Cart)
-  createcart(@Args('userId',{type:()=>Int})userId:number):Promise<Cart>{
-    return  this.cartService.createCart(userId)
+  createcart(@Args('userId',{type:()=>Int})userId:number,@Args('discount',{type:()=>Int})discount:number):Promise<Cart>{
+    return  this.cartService.createCart(userId,discount)
   }
   @Query(()=>[Cart])
   getallCarts(){
@@ -30,8 +31,18 @@ export class CartResolver {
   }
 
   @Mutation(()=>Boolean)
-  deleteBook(@Args('bookIDAndUSerId')bookAndUserID:bookToCartItemDto){
-    return this.cartService.deleteBook(bookAndUserID);
+  decreaseQuantity(@Args('bookIDAndUserId')bookAndUserID:bookToCartItemDto){
+    return this.cartService.decreaseQuantityofBook(bookAndUserID);
+  }
+
+  @Mutation(()=>Boolean)
+  deletecartItem(@Args('bookIdAndUserId')userIdAndBookId:bookToCartItemDto){
+    return this.cartService.deleteBook(userIdAndBookId)
+  }
+  @Mutation(()=>String)
+  updateDiscount(@Args('updateDiscount')discountDto:DiscountDto):Promise<string>{
+    return this.cartService.updateDiscount(discountDto)
+
   }
 
 

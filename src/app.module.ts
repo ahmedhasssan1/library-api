@@ -10,13 +10,15 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
 import { ConfigModule } from '@nestjs/config';
+import { join } from 'path';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
+      csrfPrevention:false,
       driver: ApolloDriver,
-      autoSchemaFile:'src/schema.gql',
-
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -36,7 +38,8 @@ import { ConfigModule } from '@nestjs/config';
     AuthorsModule,
     UsersModule,
     AuthModule,
-    CartModule
+    CartModule,
+    FileModule
   ],
   controllers: [AppController],
   providers: [AppService],
