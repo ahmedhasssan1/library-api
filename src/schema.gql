@@ -26,8 +26,16 @@ type Books {
   author: authors
   price: Int!
   user: Users
+  photo: String
+  published_at: DateTime
+  discription: String
   getAuthor: authors!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type tokenDto {
   access_token: String!
@@ -69,30 +77,44 @@ type Query {
 
 type Mutation {
   createBook(CreateBookWithAutor: createBookdto!): Books!
-  updateBook(updateBook: updateDto!): Books!
+  updatePhotoBook(updatePhoto: updateDto!): Books!
+  updateBook(updateBookData: UpdateBookDto!): Books!
   CreateAuthor(CreateAuthor: CreateAuthorDto!): authors!
   updateAuthor(updateAuthor: updateAuthorDto!): authors!
+  uploadPhoto(createImageInput: uploadPhotoDto!): String!
   createUser(createUser: createUserDto!): Users!
   addBookToUser(bookToUser: BookToUserDto!): Users!
   deleteUser(userId: Int!): Boolean!
-  uploadPhoto(createImageInput: uploadPhotoDto!): String!
   signIn(login: securityDto!): tokenDto!
   createcart(userId: Int!, discount: Int!): Cart!
   addCartItem(addBookIDAndUserId: bookToCartItemDto!): CartItem!
   decreaseQuantity(bookIDAndUserId: bookToCartItemDto!): Boolean!
   deletecartItem(bookIdAndUserId: bookToCartItemDto!): Boolean!
   updateDiscount(updateDiscount: DiscountDto!): String!
+  checkout(productdata: ProductData!): String!
 }
 
 input createBookdto {
   name: String!
   authorID: Int
   price: Float!
+  description: String!
+  published_at: DateTime
+  photo: Upload
 }
 
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 input updateDto {
-  id: Float!
-  name: String!
+  id: Int
+  photo: Upload!
+}
+
+input UpdateBookDto {
+  id: Int!
+  name: String
+  discription: String
 }
 
 input CreateAuthorDto {
@@ -107,6 +129,14 @@ input updateAuthorDto {
   info: String!
 }
 
+input uploadPhotoDto {
+  name: String
+  contact_info: String
+  email: String
+  password: String
+  file: Upload!
+}
+
 input createUserDto {
   name: String!
   contact_info: String!
@@ -115,20 +145,9 @@ input createUserDto {
   file: Upload!
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
 input BookToUserDto {
   userId: Int!
   BookId: Int!
-}
-
-input uploadPhotoDto {
-  name: String
-  contact_info: String
-  email: String
-  password: String
-  file: Upload!
 }
 
 input securityDto {
@@ -144,4 +163,9 @@ input bookToCartItemDto {
 input DiscountDto {
   discount: Int!
   userId: Int!
+}
+
+input ProductData {
+  userId: Int!
+  customerEmail: String!
 }

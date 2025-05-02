@@ -4,6 +4,7 @@ import { Books } from './entity/books.entity';
 import { createBookdto } from './dto/createBook.input';
 import { authors } from 'src/authors/entity/author.entity';
 import { updateDto } from './dto/update.input';
+import { UpdateBookDto } from './dto/updateBook.input';
 
 @Resolver(()=>Books)
 export class BooksResolver {
@@ -31,10 +32,13 @@ export class BooksResolver {
     return this.booksService.getAuthor(book.id)
   }
   
-  @Mutation(()=>Books)
-  updateBook(@Args('updateBook')updateBook:updateDto): Promise<Books> {
-    return this.booksService.updateBook(updateBook);
+  @Mutation(() => Books)
+  async updatePhotoBook(
+    @Args('updatePhoto') updatePhoto: updateDto): Promise<Books> {
+    return this.booksService.uploadPhotoBook(updatePhoto);
   }
+  
+
 
   @Query(()=>[Books])
   getAuthorBooks(@Args('auhtorID',{type:()=>Int})authorID:number){
@@ -45,7 +49,9 @@ export class BooksResolver {
   getOneBook(@Args('findBook',{type:()=>Int})id:number):Promise<Books>{
     return this.booksService.findOneBook(id);
   }
+  @Mutation(()=>Books)
+  updateBook(@Args('updateBookData')updatebook:UpdateBookDto){
+    return this.booksService.uppdateBook(updatebook)
+  }
  
- 
-
 }

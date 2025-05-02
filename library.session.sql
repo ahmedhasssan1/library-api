@@ -1,5 +1,5 @@
 -- DELETE FROM users WHERE id < 12;
-select * from users;
+SELECT * from books;
 
 
 

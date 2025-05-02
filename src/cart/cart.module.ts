@@ -10,5 +10,6 @@ import { BooksModule } from 'src/books/books.module';
 @Module({
   imports:[TypeOrmModule.forFeature([Cart,CartItem]),UsersModule,BooksModule],
   providers: [CartResolver, CartService],
+  exports:[CartService]
 })
 export class CartModule {}

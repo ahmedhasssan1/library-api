@@ -6,11 +6,14 @@ import { createBookdto } from './dto/createBook.input';
 import { AuthorsService } from 'src/authors/authors.service';
 import { authors } from 'src/authors/entity/author.entity';
 import { updateDto } from './dto/update.input';
+import { FilService } from 'src/file/file.service';
+import { UpdateBookDto } from './dto/updateBook.input';
 
 @Injectable()
 export class    BooksService {
     constructor(@InjectRepository(Books) private BookRepo:Repository<Books>,
-    private authorService:AuthorsService
+    private authorService:AuthorsService,
+    private fileService:FilService
 
 ){}
 
@@ -31,7 +34,10 @@ export class    BooksService {
         const createBook=this.BookRepo.create({
             name:createbook.name,
             author:findAuthor,
-            price:createbook.price
+            price:createbook.price,
+            discription:createbook.description,
+            published_at:createbook.published_at
+            
         }
         )
         // console.log('debugging ',createBook);
@@ -57,13 +63,33 @@ export class    BooksService {
 
     }
 
-    async updateBook(updateBook:updateDto):Promise<Books>{
-       const  book=await this.BookRepo.update(updateBook.id,{...updateBook})
-        const findbookIpdated=await this.BookRepo.findOneOrFail({where:{id:updateBook.id}});
-        if(!findbookIpdated){
+    async uploadPhotoBook(updateBook:updateDto):Promise<Books>{
+        
+        const file=updateBook.photo;
+
+        const photoloaded = await this.fileService.uploadImage(file);
+      
+        const findbookupdated=await this.BookRepo.findOne({where:{id:updateBook.id}});
+
+        if(!findbookupdated){
             throw new NotFoundException('this book not existing any more')
         }
-        return findbookIpdated;
+        findbookupdated.photo=photoloaded
+        await this.BookRepo.save(findbookupdated)
+        return findbookupdated;
+    }
+
+
+
+    async uppdateBook(updateBook:UpdateBookDto){
+        const Book=await this.BookRepo.findOne({where:{id:updateBook.id}})
+        if(!Book){
+            throw new NotFoundException('this book not found')
+        }
+        const{id,...resDate}=updateBook;
+        await this.BookRepo.update(id,resDate)
+        return await this.BookRepo.save(updateBook)
+
     }
 
     async getAuthor(id:number):Promise<authors>{

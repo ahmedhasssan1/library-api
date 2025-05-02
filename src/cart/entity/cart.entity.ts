@@ -19,7 +19,7 @@ export class Cart {
   @Field()
   totalPrice: number;
 
-  
+    
   @Column({default:0,nullable:true})
   @Field()
   discount: number;

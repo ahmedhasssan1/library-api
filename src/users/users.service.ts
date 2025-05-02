@@ -6,8 +6,6 @@ import { createUserDto } from './dto/create.input';
 import { BookToUserDto } from './dto/bookToUser.input';
 import { BooksService } from 'src/books/books.service';
 import   * as bcrypt from 'bcrypt'
-import { uploadPhotoDto } from '../file/dto/uploadPhoto.input';
-import { emitWarning } from 'process';
 import { FilService } from 'src/file/file.service';
 
 @Injectable()

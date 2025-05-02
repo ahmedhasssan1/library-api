@@ -2,10 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { UploadApiResponse } from 'cloudinary'
 import { ConfigService } from '@nestjs/config'
 import { v2 as cloudinary } from 'cloudinary'
-import { uploadPhotoDto } from './dto/uploadPhoto.input'
 import { cloudinaryConfig } from './configCloudinary/clouddinary.config'
-import { Repository } from 'typeorm'
-import { Users } from 'src/users/entity/user.entity'
 import { FileUpload } from 'src/common/interfaces/file-upload.interface'
 
 @Injectable()
