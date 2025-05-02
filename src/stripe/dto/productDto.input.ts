@@ -1,5 +1,4 @@
-import {  Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { int } from 'aws-sdk/clients/datapipeline';
+import {  Field, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
 export class  ProductData{

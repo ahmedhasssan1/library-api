@@ -3,9 +3,7 @@ import { UsersService } from './users.service';
 import { createUserDto } from './dto/create.input';
 import { Users } from './entity/user.entity';
 import { BookToUserDto } from './dto/bookToUser.input';
-import { NotFoundException, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
+
 
 @Resolver(()=>Users)
 export class UsersResolver {

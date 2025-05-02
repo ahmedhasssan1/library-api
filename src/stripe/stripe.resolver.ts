@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { StripeService } from './stripe.service';
 import { ProductData } from './dto/productDto.input';
 
