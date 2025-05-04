@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { FileModule } from './file/file.module';
 import { StripeModule } from './stripe/stripe.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { StripeModule } from './stripe/stripe.module';
     AuthModule,
     CartModule,
     FileModule,
-    StripeModule
+    StripeModule,
+    EmailModule
   ],
   controllers: [AppController],
   providers: [AppService],

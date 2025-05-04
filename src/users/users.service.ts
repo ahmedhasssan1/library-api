@@ -7,6 +7,7 @@ import { BookToUserDto } from './dto/bookToUser.input';
 import { BooksService } from 'src/books/books.service';
 import   * as bcrypt from 'bcrypt'
 import { FilService } from 'src/file/file.service';
+import { UpdateUserDto } from './dto/updateUser.input';
 
 @Injectable()
 export class UsersService {
@@ -83,17 +84,18 @@ export class UsersService {
         }
         return user
     }
-    // async uploadPhoto(uploadPhoto:uploadPhotoDto){
+    async updateUser(updateUSer:UpdateUserDto):Promise<Users>{
+        const user=await this.userRepo.findOne({where:{id:updateUSer.id}})
+        if(!user){
+            throw new NotFoundException('this user not exist')
+        }
+        await this.userRepo.update(updateUSer.id,{...updateUSer});
+        
+        const updatedUser = await this.userRepo.findOne({ where: { id: updateUSer.id } });
+        return updatedUser!;
 
-    //     const user= await this.getUser(uploadPhoto.userId);
-    //     if(!user){
-    //         throw new NotFoundException('this user not exist')
-    //     } 
-    //     user.photo=uploadPhoto.photo;
-    //     await this.userRepo.save(user);
-    //     return user
-
-    // }
+    }
+    
 
 
 

@@ -78,7 +78,7 @@ async addBookToUserCart(booktoCart:bookToCartItemDto):Promise<CartItem>{
 }
 
 async getUserCart(userId:number):Promise<UserCart>{
-    const findCart=await this.CartRepo.findOne({where:{user:{id:userId}}});
+    const findCart=await this.CartRepo.findOne({where:{user:{id:userId}},relations:["user"]});
     const findCartItem=await this.CartItemRepo.find({where:{cart:{user:{id:userId}}},relations:['book']})
 
     if(!findCart){

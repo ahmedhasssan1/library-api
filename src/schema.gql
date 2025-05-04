@@ -85,6 +85,7 @@ type Mutation {
   createUser(createUser: createUserDto!): Users!
   addBookToUser(bookToUser: BookToUserDto!): Users!
   deleteUser(userId: Int!): Boolean!
+  updateUser(updateUser: UpdateUserDto!): Users!
   signIn(login: securityDto!): tokenDto!
   createcart(userId: Int!, discount: Int!): Cart!
   addCartItem(addBookIDAndUserId: bookToCartItemDto!): CartItem!
@@ -92,6 +93,7 @@ type Mutation {
   deletecartItem(bookIdAndUserId: bookToCartItemDto!): Boolean!
   updateDiscount(updateDiscount: DiscountDto!): String!
   checkout(productdata: ProductData!): String!
+  sendemail(seendEmailDto: Sendemaildto!): String!
 }
 
 input createBookdto {
@@ -150,6 +152,12 @@ input BookToUserDto {
   BookId: Int!
 }
 
+input UpdateUserDto {
+  id: Int!
+  name: String
+  email: String!
+}
+
 input securityDto {
   email: String!
   password: String!
@@ -168,4 +176,11 @@ input DiscountDto {
 input ProductData {
   userId: Int!
   customerEmail: String!
+}
+
+input Sendemaildto {
+  recipienst: [String!]!
+  subject: String!
+  html: String!
+  text: String!
 }
