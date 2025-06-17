@@ -89,6 +89,10 @@ async getUserCart(userId:number):Promise<UserCart>{
         findCart.totalPrice-=(findCart.totalPrice*(findCart.discount/100))
 
     }
+    if(findCartItem.length<=0){
+        findCart.totalPrice=0;
+        await this.CartRepo.save(findCart);
+    }
     return {
         cart:findCart,
         cartitems:findCartItem

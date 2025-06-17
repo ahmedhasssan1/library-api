@@ -175,7 +175,6 @@ input DiscountDto {
 
 input ProductData {
   userId: Int!
-  customerEmail: String!
 }
 
 input Sendemaildto {

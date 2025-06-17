@@ -23,7 +23,7 @@ export class  ProductData{
   @Field(()=>Int)
   userId:number
   
-  @Field()
-  customerEmail:string
+  // @Field()
+  // customerEmail:string
 
 }

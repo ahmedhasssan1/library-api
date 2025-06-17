@@ -12,24 +12,8 @@ export class StripeService {
     private emailService:EmailService
   ) {}
 
-  async createCheckoutSession(cartProduct: ProductData) {
+  async createCheckoutSession(cartProduct: ProductData):Promise<{url:string,userCart:any}> {
     const userCart = await this.cartServce.getUserCart(cartProduct.userId);
-    try{
-    const emailToUser=await this.emailService.SendEmail({
-      recipienst:[userCart.cart.user.email],
-      subject:'ypur checkout sessions',
-      html: `<p>Dear ${userCart.cart.user.name},</p>
-      <p>Thank you for your purchase. Your checkout session has been created successfully.</p>
-      <p>Order Total: $${userCart.cart.totalPrice}</p>`,
-      text: `Dear ${userCart.cart.user.name},\n
-      Thank you for your purchase. Your checkout session has been created successfully.\n
-      Order Total: $${userCart.cart.totalPrice}`,
-    })
-    console.log('email to user',emailToUser)
-
-  }catch(error){
-    console.error('errrot sending email',error)
-  }
     // Corrected `line_items` structure
     const session = await stripe.checkout.sessions.create({
       line_items: userCart.cartitems.map((prod) => ({
@@ -49,12 +33,12 @@ export class StripeService {
       payment_intent_data: {
         setup_future_usage: 'on_session',
       },
-      success_url: "https://res.cloudinary.com/duj5aatpw/image/upload/v1746133937/avatars/1746133935834-oldman.jpg.jpg",
+      success_url: "https://www.shutterstock.com/image-photo/smartphone-online-payment-hand-hold-260nw-2355579741.jpg",
       cancel_url: 'http://localhost:3000/pay/failed/checkout/session', 
-      customer_email: cartProduct.customerEmail,
+      customer_email: 'ah1589@gmail.com',
     });
     
 
-    return session.url;
+    return {url:session.url??'',userCart};
   }
 }
