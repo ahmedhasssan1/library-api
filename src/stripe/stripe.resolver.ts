@@ -3,7 +3,8 @@ import { StripeService } from './stripe.service';
 import { ProductData } from './dto/productDto.input';
 import { EmailService } from 'src/email/email.service';
 import { RawBodyRequest, Req } from '@nestjs/common';
-import { SessionStatusResponse } from './dto/SessionStatusResponse.dto';
+import {  SessionStatusResult } from './dto/sessionRes.dto';
+import { RefundDto } from './dto/refund.dto';
 
 @Resolver()
 export class StripeResolver {
@@ -16,17 +17,13 @@ export class StripeResolver {
     const {url}=await this.stripeService.createCheckoutSession(productdata);
     return url;
   }
-  @Query(()=>SessionStatusResponse)
-     async sessionStatus(@Args('session_id') sessionId: string) {
-      try{
-        const session=await this.stripeService.getSessionStatus(sessionId);
-        return session
-      }catch(error){{
-        return{
-          status:'',
-          customer_email:''
-        }
-      }}
+  @Query(()=>SessionStatusResult)
+  async getSessionRes(@Args('sessionId')session_Id:string){
+    return this.stripeService.getSessionStatus(session_Id);
+  }
+  @Mutation(()=>String)
+  async Refund(@Args('RefundData')chargeID:string){
+    return await this.stripeService.refund(chargeID) 
   }
 }
 

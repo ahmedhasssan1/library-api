@@ -1,10 +1,11 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import { IsEmail, IsOptional } from "class-validator";
+import { IsEmail, IsNumber, IsOptional } from "class-validator";
 
 @InputType()
 export class UpdateUserDto{
 
     @Field(()=>Int)
+    @IsNumber()
     id:number
 
 

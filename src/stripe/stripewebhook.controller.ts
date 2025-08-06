@@ -9,6 +9,7 @@ import {
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import { EmailService } from 'src/email/email.service';
+import { ConfigService } from '@nestjs/config';
 const stripe = new Stripe(process.env.STRIPE_WEBHOOK_SECRET || 'whsec_a4f682f1ee21669c04d63cf9277b962ac221e8d5cfb491b8243c75565514e4e8', {
     apiVersion: '2025-04-30.basil' as any, 
 
@@ -16,7 +17,9 @@ const stripe = new Stripe(process.env.STRIPE_WEBHOOK_SECRET || 'whsec_a4f682f1ee
 
 @Controller('webhook')
 export class StripeWebhookController {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly emailService: EmailService,
+    private readonly configservice:ConfigService
+  ) {}
 
   @Post()
   @HttpCode(200)
@@ -32,7 +35,7 @@ export class StripeWebhookController {
       event = stripe.webhooks.constructEvent(
         rawBody,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET ||'whsec_a4f682f1ee21669c04d63cf9277b962ac221e8d5cfb491b8243c75565514e4e8',
+        this.configservice.get<string>('STRIPE_WEBHOOK_SECRET') || 'whsec_a4f682f1ee21669c04d63cf9277b962ac221e8d5cfb491b8243c75565514e4e8',
       );
     } catch (err) {
       console.error(' Webhook signature verification failed:', err.message);
@@ -52,7 +55,7 @@ export class StripeWebhookController {
       case 'invoice.payment_failed':
         await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
         break;
-
+        
       default:
         console.log(` Unhandled event type: ${event.type}`);
     }
@@ -63,6 +66,13 @@ export class StripeWebhookController {
   private async handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
     const email = session.customer_details?.email;
     const amount = (session.amount_total ?? 0) / 100;
+    const fullSession=await stripe.checkout.sessions.retrieve(session.id,{
+      expand:['payment_intent', 'payment_intent.charges']
+    })
+    const paymentIntent = fullSession.payment_intent as Stripe.PaymentIntent & {
+    charges: { data: Stripe.Charge[] };
+  };
+  const chargeId = paymentIntent?.charges?.data?.[0]?.id;
 
     if (email) {
       await this.emailService.SendEmail({
@@ -74,6 +84,7 @@ export class StripeWebhookController {
     }
 
     console.log(' checkout.session.completed for', email);
+    console.log(' chargeID', chargeId);
   }
 
   private async handleInvoicePaid(invoice: Stripe.Invoice) {

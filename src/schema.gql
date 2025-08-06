@@ -62,9 +62,11 @@ type UserCart {
   cart: Cart!
 }
 
-type SessionStatusResponse {
-  status: String!
-  customer_email: String!
+type SessionStatusResult {
+  charge_id: String
+  status: String
+  customer_email: String
+  amount_total: Float
 }
 
 type Query {
@@ -78,7 +80,7 @@ type Query {
   getAllUsers: [Users!]!
   getallCarts: [Cart!]!
   getUserCart(userId: Int!): UserCart!
-  sessionStatus(session_id: String!): SessionStatusResponse!
+  getSessionRes(sessionId: String!): SessionStatusResult!
 }
 
 type Mutation {
@@ -99,6 +101,7 @@ type Mutation {
   deletecartItem(bookIdAndUserId: bookToCartItemDto!): Boolean!
   updateDiscount(updateDiscount: DiscountDto!): String!
   checkout(productdata: ProductData!): String!
+  Refund(RefundData: String!): String!
   sendemail(seendEmailDto: Sendemaildto!): String!
 }
 

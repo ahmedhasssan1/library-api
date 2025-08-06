@@ -1,5 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { isString, IsString } from 'class-validator';
+import {  IsString } from 'class-validator';
 
 @ObjectType()
 export class SessionStatusResponse {
