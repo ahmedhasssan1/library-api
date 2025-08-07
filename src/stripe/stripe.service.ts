@@ -5,11 +5,15 @@ import { CartService } from 'src/cart/cart.service';
 import { EmailService } from 'src/email/email.service';
 import { RefundDto } from './dto/refund.dto';
 import { ref } from 'process';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const stripe = new Stripe('sk_test_51RJj4kKKBuv1gV0RqLuVhakDgatKPsUxtKo3AOvnFUEOZDyv4FLxP2zGvAisdxHUiIyLoCJMISXOBP7bnQrXUt0f00fZZWPGmB');
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 // const refund=stripe.refunds.create({
 //   charge:
 // })
+
 @Injectable()
 export class StripeService {
   constructor(private cartServce: CartService,
@@ -18,9 +22,8 @@ export class StripeService {
 
   async createCheckoutSession(cartProduct: ProductData):Promise<{url:string,userCart:any}> {
     const userCart = await this.cartServce.getUserCart(cartProduct.userId);
-    // Corrected `line_items` structure
     const session = await stripe.checkout.sessions.create({
-  
+
       line_items: userCart.cartitems.map((prod) => ({
         price_data: {
           currency: 'usd',
@@ -40,15 +43,17 @@ export class StripeService {
       },
       billing_address_collection:'required',
       automatic_tax:{enabled:false},
+      
       shipping_address_collection:{
         allowed_countries:['US','CA','EG',]
       },
+      tax_id_collection: { enabled: false },
       shipping_options:[
         {
             shipping_rate_data:{
               type:'fixed_amount',
               fixed_amount:{
-                amount:600,
+                amount:userCart.cart.totalPrice,
                 currency:'usd'
               },
               display_name:'USPS First Class Mail',
@@ -66,15 +71,19 @@ export class StripeService {
         }
       ],
       
-      // return_url: `http://localhost:3000/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      success_url: "https://www.shutterstock.com/image-photo/smartphone-online-payment-hand-hold-260nw-2355579741.jpg",
       
-      cancel_url: 'http://localhost:3000/pay/failed/checkout/session', 
+
+      // return_url: `http://localhost:3000/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: 'https://sterling-adversely-mink.ngrok-free.app/pay/failed/checkout/session',
+      success_url: 'https://sterling-adversely-mink.ngrok-free.app/success',
+
       customer_email: userCart.cart.user.email,
     });
- 
+      
+    // const paymentMethodDomain = await stripe.paymentMethodDomains.create({
+    //     domain_name: 'checkout.stripe.com',
+    // })
     console.log("session id :",session.id);
-    
 
     return {url:session.url??'',userCart};
   }
@@ -91,6 +100,7 @@ export class StripeService {
         status: session.status,
         customer_email: session.customer_details?.email,
         amount_total: (session.amount_total ?? 0) / 100,
+
         message: 'No charge found for this session.',
       };
     }
@@ -105,17 +115,24 @@ export class StripeService {
     };
   }
   // stripe.service.ts
-async refund(charge_id:string): Promise<string> {
-  console.log('Refunding charge:', charge_id);
+  async refund(charge_id:string): Promise<string> {
+    console.log('Refunding charge:', charge_id);
 
-  const refund = await stripe.refunds.create({
-    charge: charge_id,
-    amount: 20000, // optional for partial refund
-    reason: "requested_by_customer"
-  });
+    const refund = await stripe.refunds.create({
+      charge: charge_id,
+      amount: 20000, // optional for partial refund
+      reason: "requested_by_customer"
+    });
 
-  return `Refund of $${(refund.amount / 100).toFixed(2)} successful. Refund ID: ${refund.id}, ${refund.status}`;
-}
+    return `Refund of $${(refund.amount / 100).toFixed(2)} successful. Refund ID: ${refund.id}, ${refund.status}`;
+  }
+  async PaymentMethod(customerId){
+    const setupintent=await stripe.setupIntents.create({
+      customer:customerId,
+      payment_method_types:['card']
+    })
+  }
+
 
 
 }
