@@ -91,6 +91,7 @@ export class UsersService {
         }
         await this.userRepo.update(updateUSer.id,{...updateUSer});
         
+        await this.userRepo.save(updateUSer);
         const updatedUser = await this.userRepo.findOne({ where: { id: updateUSer.id } });
         return updatedUser!;
 

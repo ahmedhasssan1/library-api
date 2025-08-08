@@ -1,26 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import { raw, json, urlencoded } from 'express';
+import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
 
-  // Enable raw body only for Stripe webhook
+  // ✅ Raw body for Stripe webhook only
   app.use('/webhook', raw({ type: 'application/json' }));
 
-  // Apply other body parsers (after raw for /webhook)
+  // ✅ Normal parsers for everything else
   app.use(json());
   app.use(urlencoded({ extended: true }));
 
-  // GraphQL file upload
+  // GraphQL file uploads
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
 
-  // CORS
   app.enableCors();
 
-  // Global validation
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

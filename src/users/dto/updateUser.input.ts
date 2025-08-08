@@ -18,4 +18,12 @@ export class UpdateUserDto{
     @Field()
     email?:string
 
+    @IsOptional()
+    @IsEmail()
+    @Field()
+    walletBalance?:number
+    
+
+
+
 }

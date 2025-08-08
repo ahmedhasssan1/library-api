@@ -18,6 +18,7 @@ type Users {
   password: String!
   book: [Books!]
   photo: String
+  walletBalance: Float!
 }
 
 type Books {
@@ -102,6 +103,7 @@ type Mutation {
   updateDiscount(updateDiscount: DiscountDto!): String!
   checkout(productdata: ProductData!): String!
   Refund(RefundData: String!): String!
+  topup(topupDto: Float!): String!
   sendemail(seendEmailDto: Sendemaildto!): String!
 }
 
@@ -165,6 +167,7 @@ input UpdateUserDto {
   id: Int!
   name: String
   email: String!
+  walletBalance: Float!
 }
 
 input securityDto {

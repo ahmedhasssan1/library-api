@@ -10,15 +10,22 @@ import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
-const stripe = new Stripe(process.env.STRIPE_WEBHOOK_SECRET || 'whsec_a4f682f1ee21669c04d63cf9277b962ac221e8d5cfb491b8243c75565514e4e8', {
-    apiVersion: '2025-04-30.basil' as any, 
+import { StripeService } from './stripe.service';
+import { UsersService } from 'src/users/users.service';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-});
+
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string,)
 
 @Controller('webhook')
 export class StripeWebhookController {
   constructor(private readonly emailService: EmailService,
-    private readonly configservice:ConfigService
+    private readonly configservice:ConfigService,
+    private readonly StripeService:StripeService,
+    private readonly userService:UsersService
+
   ) {}
 
   @Post()
@@ -31,21 +38,39 @@ export class StripeWebhookController {
     let event: Stripe.Event;
 
     try {
-      const rawBody = req.body as Buffer;
+      // const sig=req.headers['strip']
       event = stripe.webhooks.constructEvent(
-        rawBody,
+        req.body,
         signature,
-        this.configservice.get<string>('STRIPE_WEBHOOK_SECRET') || 'whsec_a4f682f1ee21669c04d63cf9277b962ac221e8d5cfb491b8243c75565514e4e8',
+         process.env.STRIPE_WEBHOOK_SECRET as string,
       );
     } catch (err) {
       console.error(' Webhook signature verification failed:', err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    // 🎯 Handle specific events
+    //  Handle specific events
     switch (event.type) {
-      case 'checkout.session.completed':
-        await this.handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+    case 'checkout.session.completed':
+        console.log(' Received checkout.session.completed');
+
+          const session = event.data.object;  
+          const userId = session.metadata?.userId;
+          const topupAmount = Number(session.metadata?.topupAmount);
+          console.log('debugging ',session);
+          
+          if (userId && topupAmount) {
+            const user = await this.userService.getUser(Number(userId));
+
+            const newBalance = (user.walletBalance || 0) + topupAmount;
+            
+            console.log(`User ${userId} topped up ${topupAmount}. New balance: ${newBalance} `);
+            await this.userService.updateUser({
+              id: Number(userId),
+              walletBalance: newBalance
+            });
+
+          }
         break;
 
       case 'invoice.paid':

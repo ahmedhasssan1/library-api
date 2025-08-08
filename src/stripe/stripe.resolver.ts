@@ -5,6 +5,7 @@ import { EmailService } from 'src/email/email.service';
 import { RawBodyRequest, Req } from '@nestjs/common';
 import {  SessionStatusResult } from './dto/sessionRes.dto';
 import { RefundDto } from './dto/refund.dto';
+import { TopupDto } from './dto/topup.dto';
 
 @Resolver()
 export class StripeResolver {
@@ -24,6 +25,11 @@ export class StripeResolver {
   @Mutation(()=>String)
   async Refund(@Args('RefundData')chargeID:string){
     return await this.stripeService.refund(chargeID) 
+  }
+  @Mutation(()=>String)
+  async topup(@Args('topupDto')userId:number){
+    const session= await this.stripeService.createTopUpSession(userId);
+    return session.url
   }
 }
 

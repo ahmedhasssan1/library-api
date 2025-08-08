@@ -14,6 +14,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 //   charge:
 // })
 
+
 @Injectable()
 export class StripeService {
   constructor(private cartServce: CartService,
@@ -22,8 +23,10 @@ export class StripeService {
 
   async createCheckoutSession(cartProduct: ProductData):Promise<{url:string,userCart:any}> {
     const userCart = await this.cartServce.getUserCart(cartProduct.userId);
-    const session = await stripe.checkout.sessions.create({
+    const userId=cartProduct.userId;
 
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types:['card'],
       line_items: userCart.cartitems.map((prod) => ({
         price_data: {
           currency: 'usd',
@@ -37,6 +40,7 @@ export class StripeService {
         
         quantity: prod.quantit, 
       })),
+   
       mode: 'payment',
       payment_intent_data: {
         setup_future_usage: 'on_session',
@@ -80,11 +84,14 @@ export class StripeService {
       customer_email: userCart.cart.user.email,
     });
       
-    // const paymentMethodDomain = await stripe.paymentMethodDomains.create({
-    //     domain_name: 'checkout.stripe.com',
-    // })
-    console.log("session id :",session.id);
+    //4000056655665556
+    //5555555555554444
+  
 
+    const domain=await stripe.paymentMethodDomains.create({
+      domain_name:'stripe.com'
+    }) 
+    console.log("session id :",session.id);
     return {url:session.url??'',userCart};
   }
   async getSessionStatus(session_id: string) {
@@ -114,25 +121,50 @@ export class StripeService {
       amount_total: (session.amount_total ?? 0) / 100,
     };
   }
-  // stripe.service.ts
   async refund(charge_id:string): Promise<string> {
     console.log('Refunding charge:', charge_id);
 
     const refund = await stripe.refunds.create({
       charge: charge_id,
-      amount: 20000, // optional for partial refund
+      amount: 20000,
       reason: "requested_by_customer"
     });
 
     return `Refund of $${(refund.amount / 100).toFixed(2)} successful. Refund ID: ${refund.id}, ${refund.status}`;
   }
-  async PaymentMethod(customerId){
-    const setupintent=await stripe.setupIntents.create({
-      customer:customerId,
-      payment_method_types:['card']
-    })
+  async PaymentMethod(customerId: string): Promise<Stripe.SetupIntent> {
+    return await stripe.setupIntents.create({
+    customer: customerId,
+    payment_method_types: ['card'],
+    });
   }
+  async createTopUpSession(userId: number) {
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'], 
+    mode: 'payment',
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Wallet Top-up',
+          },
+          unit_amount: 200 * 100, // amount in cents
+        },
+        quantity: 1,
+      },
+    ],
+       cancel_url: 'https://sterling-adversely-mink.ngrok-free.app/pay/failed/checkout/session',
+      success_url: 'https://loveimgvs.click/product_tag/119291499_.html',
 
+    metadata: {
+      userId,
+      topupAmount: 300,
+    },
+  });
+
+  return { url: session.url };
+}
 
 
 }

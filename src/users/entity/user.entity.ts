@@ -35,6 +35,10 @@ export class Users{
     @Field({nullable:true})
     photo:string
 
+    @Column({type:'int',default:300})
+    @Field()
+    walletBalance:number
+
 
 
 
